@@ -4,7 +4,6 @@ const connectDB = require("./configs/connectDB");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const { errorHandler } = require("./middlewares/errorMiddleware");
-const { authenticated } = require("./middlewares/auth");
 
 const port = process.env.PORT || 3000;
 
@@ -40,8 +39,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// route admin
-app.use("/API/v1/admin", require("./routes/user"));
+// route user
+app.use("/API/v1/user", require("./routes/user"));
 
 // app.get("/API/v1/admin/profile", authenticated, (req, res) => {
 //   return res.status(200).json({ msg: "ok" });

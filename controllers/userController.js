@@ -2,12 +2,10 @@ const User = require("./../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-// @desc    Register new admin
-// @route   POST  /API/v1/admin/signup
+// @desc    Register new user
+// @route   POST  /API/v1/user/signup
 // @access  public
 exports.handleSignup = async (req, res) => {
-  console.log(req.isAuthenticated())
-
   try {
     const { fullname, username, password } = req.body;
 
@@ -55,12 +53,10 @@ exports.handleSignup = async (req, res) => {
   }
 };
 
-// @desc    active admin
-// @route   POST  /API/v1/admin/active
+// @desc    active user
+// @route   POST  /API/v1/user/active
 // @access  public
 exports.handleActive = async (req, res) => {
-  console.log(req.isAuthenticated())
-
   try {
     const { code, token } = req.body;
     const { key: username } = jwt.decode(token);
@@ -89,12 +85,10 @@ exports.handleActive = async (req, res) => {
   }
 };
 
-// @desc    signin admin
-// @route   POST  /API/v1/admin/login
+// @desc    signin user
+// @route   POST  /API/v1/user/login
 // @access  public
 exports.handleSignin = async (req, res) => {
-  console.log(req.isAuthenticated())
-
   try {
     const { username, password } = req.body;
 
@@ -143,8 +137,8 @@ exports.handleSignin = async (req, res) => {
   }
 };
 
-// @desc    forget password admin
-// @route   POST  /API/v1/admin/forget-password
+// @desc    forget password user
+// @route   POST  /API/v1/user/forget-password
 // @access  public
 exports.handleForgetPassword = async (req, res) => {
   try {
@@ -161,8 +155,8 @@ exports.handleForgetPassword = async (req, res) => {
   }
 };
 
-// @desc    check code for change password admin
-// @route   POST  /API/v1/admin/check-code-set-password
+// @desc    check code for change password user
+// @route   POST  /API/v1/user/check-code-set-password
 // @access  public
 exports.checkCodeSetPassword = async (req, res) => {
   try {
@@ -177,7 +171,7 @@ exports.checkCodeSetPassword = async (req, res) => {
 };
 
 // @desc    set new password
-// @route   POST  /API/v1/admin/set-new-password
+// @route   POST  /API/v1/user/set-new-password
 // @access  public
 exports.setNewPassword = async (req, res) => {
   try {
