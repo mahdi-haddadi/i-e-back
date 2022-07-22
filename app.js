@@ -29,7 +29,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: "mongodb://127.0.0.1:27017/hangouts",
+      mongoUrl: "mongodb://127.0.0.1:27017/income-expenses",
       ttl: 30 * 24 * 60 * 60,
     }),
     unset: "destroy",

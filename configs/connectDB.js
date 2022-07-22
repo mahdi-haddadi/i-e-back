@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 module.exports = connectDB = async () => {
   await mongoose
-    .connect(`mongodb://127.0.0.1:27017/hangouts`, {
+    .connect(`mongodb://127.0.0.1:27017/income-expenses`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
