@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const { schema } = require("./secure/incomeValidation");
 const incomeSchema = new mongoose.Schema(
   {
     origin: {
@@ -15,8 +15,9 @@ const incomeSchema = new mongoose.Schema(
       required: [true, "Add This Field Date Of Deposit"],
     },
     storage: {
-      type: mongoose.Schema.Types.name,
-      ref: "Source",
+      // type: mongoose.Schema.Types.name,
+      // ref: "Source",
+      type:String,
       required: [true, "Add This Field Storage"],
     },
     title: {
@@ -32,5 +33,10 @@ const incomeSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+incomeSchema.statics.incomeValidation = function (body) {
+  return schema.validate(body, { abortEarly: false });
+};
+
 const Income = mongoose.model("Income", incomeSchema);
 module.exports = Income;
