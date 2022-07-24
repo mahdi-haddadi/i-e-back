@@ -10,6 +10,12 @@ const {
   handleUpdateIncome,
   handleDeleteIncome,
 } = require("../controllers/incomeController");
+const {
+  handleGetSource,
+  handleSetSource,
+  handleUpdateSource,
+  handleDeleteSource,
+} = require("../controllers/sourceController");
 
 const router = require("express").Router();
 
@@ -24,5 +30,11 @@ router.get("/get-expense", handleGetExpense);
 router.post("/set-expense", handleSetExpense);
 router.put("/update-expense", handleUpdateExpense);
 router.delete("/delete-expense", handleDeleteExpense);
+
+// expense route
+router.get("/get-source", handleGetSource);
+router.post("/set-source", handleSetSource);
+router.put("/update-source", handleUpdateSource);
+router.delete("/delete-source", handleDeleteSource);
 
 module.exports = router;

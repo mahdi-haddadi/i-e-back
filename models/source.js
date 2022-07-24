@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { schema } = require("./secure/sourceValidation");
 
 const sourceSchema = new mongoose.Schema({
   name: {
@@ -14,6 +15,10 @@ const sourceSchema = new mongoose.Schema({
     default: 0,
   },
 });
+
+sourceSchema.statics.sourceValidation = function (body) {
+  return schema.validate(body, { abortEarly: false });
+};
 const Source = mongoose.model("Source", sourceSchema);
 
 module.exports = Source;
