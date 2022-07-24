@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const { schema } = require("./secure/expenseValidation");
 const expenseSchema = new mongoose.Schema(
   {
     title: {
@@ -11,8 +11,9 @@ const expenseSchema = new mongoose.Schema(
       type: String,
     },
     source: {
-      type: mongoose.Schema.Types.name,
-      ref: "Source",
+      // type: mongoose.Schema.Types.name,
+      // ref: "Source",
+      type: String,
       required: [true, "Add This Field source"],
     },
     cost: {
@@ -28,6 +29,9 @@ const expenseSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+expenseSchema.statics.expenseValidation = function (body) {
+  return schema.validate(body, { abortEarly: false });
+};
 const Expense = mongoose.model("Expense", expenseSchema);
 
 module.exports = Expense;
