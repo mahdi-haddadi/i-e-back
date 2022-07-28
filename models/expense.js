@@ -9,6 +9,7 @@ const expenseSchema = new mongoose.Schema(
     },
     description: {
       type: String,
+      default:null
     },
     source: {
       // type: mongoose.Schema.Types.name,

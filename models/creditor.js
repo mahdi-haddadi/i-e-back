@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { schema } = require("./secure/creditorValidation");
 
 const creditorSchema = new mongoose.Schema(
   {
@@ -12,14 +13,19 @@ const creditorSchema = new mongoose.Schema(
     },
     description: {
       type: String,
+      default:null
     },
     loanDate: {
       type: Date,
+      default: null,
     },
   },
   {
     timestamps: true,
   }
 );
+creditorSchema.statics.creditorValidation = function (body) {
+  return schema.validate(body, { abortEarly: false });
+};
 const Creditor = mongoose.model("Creditor", creditorSchema);
 module.exports = Creditor;

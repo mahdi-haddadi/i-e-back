@@ -1,4 +1,10 @@
 const {
+  handleGetCreditor,
+  handleSetCreditor,
+  handleUpdateCreditor,
+  handleDeleteCreditor,
+} = require("../controllers/creditorController");
+const {
   handleGetDebtor,
   handleSetDebtor,
   handleUpdateDebtor,
@@ -48,5 +54,11 @@ router.get("/get-debtor", handleGetDebtor);
 router.post("/set-debtor", handleSetDebtor);
 router.put("/update-debtor", handleUpdateDebtor);
 router.delete("/delete-debtor", handleDeleteDebtor);
+
+// creditor route
+router.get("/get-creditor", handleGetCreditor);
+router.post("/set-creditor", handleSetCreditor);
+router.put("/update-creditor", handleUpdateCreditor);
+router.delete("/delete-creditor", handleDeleteCreditor);
 
 module.exports = router;

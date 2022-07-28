@@ -9,6 +9,7 @@ const sourceSchema = new mongoose.Schema({
   description: {
     type: String,
     maxlength: [300, "The Description Is long"],
+    default:null
   },
   stock: {
     type: Number,
