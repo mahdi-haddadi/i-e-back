@@ -1,4 +1,10 @@
 const {
+  handleGetDebtor,
+  handleSetDebtor,
+  handleUpdateDebtor,
+  handleDeleteDebtor,
+} = require("../controllers/debtorController");
+const {
   handleGetExpense,
   handleSetExpense,
   handleUpdateExpense,
@@ -36,5 +42,11 @@ router.get("/get-source", handleGetSource);
 router.post("/set-source", handleSetSource);
 router.put("/update-source", handleUpdateSource);
 router.delete("/delete-source", handleDeleteSource);
+
+// debtor route
+router.get("/get-debtor", handleGetDebtor);
+router.post("/set-debtor", handleSetDebtor);
+router.put("/update-debtor", handleUpdateDebtor);
+router.delete("/delete-debtor", handleDeleteDebtor);
 
 module.exports = router;
