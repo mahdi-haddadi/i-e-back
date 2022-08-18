@@ -6,7 +6,7 @@ const Income = require("./../models/Income");
 exports.handleGetIncome = async (req, res) => {
   try {
     const incomeData = await Income.find({});
-    return res.status(200).json({ data: incomeData });
+    return res.status(200).json(incomeData);
   } catch (error) {
     return res
       .status(500)
@@ -86,7 +86,7 @@ exports.handleUpdateIncome = async (req, res) => {
 // @access  public
 exports.handleDeleteIncome = async (req, res) => {
   try {
-    await Income.deleteOne({ _id: req.body._id });
+    await Income.deleteOne({ _id: req.body.id });
     return res.status(200).json({ success: true });
   } catch (error) {
     return res

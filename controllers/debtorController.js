@@ -6,7 +6,7 @@ const Debtor = require("./../models/Debtor");
 exports.handleGetDebtor = async (req, res) => {
   try {
     const debtorData = await Debtor.find({});
-    return res.status(200).json({ data: debtorData });
+    return res.status(200).json(debtorData);
   } catch (error) {
     return res
       .status(500)

@@ -3,6 +3,7 @@ const passport = require("passport");
 const connectDB = require("./configs/connectDB");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
+const cors = require('cors');
 const { errorHandler } = require("./middlewares/errorMiddleware");
 
 const port = process.env.PORT || 3000;
@@ -20,6 +21,7 @@ const app = express();
 // express parser
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cors())
 
 // sesstion config
 app.use(
@@ -49,7 +51,7 @@ app.use("/API/v1/manage", require("./routes/manage"));
 
 // page 404
 app.use("/", (req, res) => {
-  res.status(404).send("request failed");
+  res.status(404).json({msg:'request failed'});
 });
 
 // error handler

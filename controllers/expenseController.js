@@ -6,7 +6,7 @@ const Expense = require("./../models/Expense");
 exports.handleGetExpense = async (req, res) => {
   try {
     const expenseData = await Expense.find({});
-    return res.status(200).json({ data: expenseData });
+    return res.status(200).json(expenseData);
   } catch (error) {
     return res
       .status(500)

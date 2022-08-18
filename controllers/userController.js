@@ -35,7 +35,7 @@ exports.handleSignup = async (req, res) => {
       return res.status(201).json({
         success: true,
         active: user.active,
-        token: generateToken(user.username),
+        token: generateToken(user._id),
       });
     } else {
       return res.status(400).json({ msg: "invalid user data" });
@@ -128,8 +128,7 @@ exports.handleSignin = async (req, res) => {
     return res.status(200).json({
       success: true,
       token: generateToken({
-        fullname: user.fullname,
-        username: user.username,
+        id: user._id,
       }),
     });
   } catch (error) {
