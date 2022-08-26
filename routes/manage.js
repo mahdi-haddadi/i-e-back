@@ -28,14 +28,15 @@ const {
   handleUpdateSource,
   handleDeleteSource,
 } = require("../controllers/sourceController");
+const { accessToken } = require("../middlewares/auth");
 
 const router = require("express").Router();
 
 // income route
-router.get("/get-income", handleGetIncome);
-router.post("/set-income", handleSetIncome);
-router.put("/update-income", handleUpdateIncome);
-router.delete("/delete-income", handleDeleteIncome);
+router.get("/get-income", accessToken, handleGetIncome);
+router.post("/set-income", accessToken, handleSetIncome);
+router.put("/update-income", accessToken, handleUpdateIncome);
+router.delete("/delete-income", accessToken, handleDeleteIncome);
 
 // expense route
 router.get("/get-expense", handleGetExpense);
