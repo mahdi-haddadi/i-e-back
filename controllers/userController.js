@@ -1,11 +1,12 @@
-const User = require("./../models/User");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const User = require("./../models/User");
+const { generateToken } = require("../utils/generateToken");
+const { handleError } = require("../utils/handleError");
 
 // @desc    Register new user
 // @route   POST  /API/v1/user/signup
 // @access  public
-exports.handleSignup = async (req, res) => {
+exports.handleSignup = async (req, res, next) => {
   try {
     const { fullname, username, password } = req.body;
 
@@ -13,12 +14,9 @@ exports.handleSignup = async (req, res) => {
     await User.userValidation(req.body);
 
     // check user already exist
-    const userExist = await User.findOne({ username });
-    if (userExist) {
-      return res
-        .status(400)
-        .json({ msg: "این کاربر در سیستم قبلا ثبت شده است" });
-      // throw new Error("این کاربر در سیستم قبلا ثبت شده است");
+    const user = await User.findOne({ username });
+    if (user) {
+      handleError(422, "User Already Exist!", { success: false });
     }
 
     // hash password
@@ -26,103 +24,84 @@ exports.handleSignup = async (req, res) => {
     const hashPassword = await bcrypt.hash(password, salt);
 
     // create user
-    const user = await User.create({
-      fullname,
-      username,
-      password: hashPassword,
-    });
-    if (user) {
-      return res.status(201).json({
-        success: true,
-        active: user.active,
-        token: generateToken(user._id),
-      });
-    } else {
-      return res.status(400).json({ msg: "invalid user data" });
-      // throw new Error("invalid user data");
-    }
+    User.create(
+      {
+        fullname,
+        username,
+        password: hashPassword,
+      },
+      (err, _user) => {
+        if (err) {
+          handleError(500, "ooops", { success: false, error: err });
+        }
+        const token = generateToken({ id: _user._id, active: _user.active });
+        return res.status(201).json({
+          success: true,
+          token,
+          msg: "User Created",
+        });
+      }
+    );
   } catch (error) {
-    const errors = [];
-    error.inner.forEach((e) => {
-      errors.push({
-        name: e.path,
-        errors: e.errors,
-      });
-    });
-    return res.status(400).json({ msg: errors });
+    next(error);
   }
 };
 
 // @desc    active user
 // @route   POST  /API/v1/user/active
-// @access  public
-exports.handleActive = async (req, res) => {
+// @access  protect
+exports.handleActive = async (req, res, next) => {
   try {
-    const { code, token } = req.body;
-    const { key: username } = jwt.decode(token);
-    const user = await User.findOne({ username });
-    // check exist user
-    if (!user) {
-      return res.status(400).json({ msg: "user not exist", success: false });
-    }
+    const { code } = req.body;
+    const user = await User.findOne({ _id: req.userId });
+
     // check active user
     if (user.active) {
-      return res.status(400).json({ msg: "user is active", success: false });
+      handleError(400, "user is active", { success: false });
     }
     // check to be right code
     if (code !== "123456") {
-      return res.status(400).json({ msg: "code is false", success: false });
+      handleError(400, "code is false", { success: false });
     }
 
     //   active user
     await User.updateOne(
-      { username: user.username },
+      { _id: user._id.toString() },
       { $set: { active: true } }
     );
-    return res.status(200).json({ msg: "activated", success: true });
+    return res.status(200).json({ msg: "User Activated", success: true });
   } catch (error) {
-    return res.status(500).json({ msg: "there is a problem" });
+    next(error);
   }
 };
 
 // @desc    signin user
 // @route   POST  /API/v1/user/login
 // @access  public
-exports.handleSignin = async (req, res) => {
+exports.handleSignin = async (req, res, next) => {
   try {
     const { username, password } = req.body;
+
+    await User.userSigninValidation(req.body);
 
     // get user
     const user = await User.findOne({ username });
 
-    // check enter username and password
-    if (!username || !password) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "enter username and password" });
-    }
-
     // check exist user
     if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, msg: "user is not exist", login: false });
+      handleError(401, "user is not exist", { success: false, login: false });
     }
 
     // check activate user
     if (!user.active) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "user is not active" });
+      handleError(422, "user is not active", { success: false, active: false });
     }
 
     // sync password user
     const syncPassword = await bcrypt.compare(password, user.password);
     // check sync password user
     if (!syncPassword) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "username or password is not true" });
+      handleError(400, "username or password is not true", { success: false });
     }
     // success login
     return res.status(200).json({
@@ -130,65 +109,77 @@ exports.handleSignin = async (req, res) => {
       token: generateToken({
         id: user._id,
       }),
+      data: {
+        fullname: user.fullname,
+        username: user.username,
+      },
     });
   } catch (error) {
-    return res.status(500).json({ msg: "there is a problem" });
+    next(error);
   }
 };
 
 // @desc    forget password user
 // @route   POST  /API/v1/user/forget-password
 // @access  public
-exports.handleForgetPassword = async (req, res) => {
+exports.handleForgetPassword = async (req, res, next) => {
   try {
     const { username } = req.body;
     const user = await User.findOne({ username });
     // check exsit user
     if (!user) {
-      return res.status(400).json({ msg: "user not exist", user: false });
+      handleError(400, "user not exist", { user: false, success: false });
     }
     // send code to email or phone number
     return res.status(200).json({ success: true });
   } catch (error) {
-    return res.status(500).json({ msg: "there is a problem" });
+    next(error);
   }
 };
 
 // @desc    check code for change password user
 // @route   POST  /API/v1/user/check-code-set-password
 // @access  public
-exports.checkCodeSetPassword = async (req, res) => {
+exports.checkCodeSetPassword = async (req, res, next) => {
   try {
     const { code } = req.body;
     if (code !== "123456") {
-      return res.status(400).json({ success: false, msg: "code is false" });
+      handleError(400, "code is false", { success: false });
     }
     return res.status(200).json({ success: true });
   } catch (error) {
-    return res.status(500).json({ msg: "there is a problem" });
+    next(error);
   }
 };
 
 // @desc    set new password
 // @route   POST  /API/v1/user/set-new-password
 // @access  public
-exports.setNewPassword = async (req, res) => {
+exports.setNewPassword = async (req, res, next) => {
   try {
     const { username, password, passwordConfirm } = req.body;
     const user = await User.findOne({ username });
     if (!user) {
-      return res.status(400).json({ success: false, msg: "user not exist" });
+      handleError(400, "user not exist", { success: false });
     }
     if (password !== passwordConfirm) {
-      return res.status(400).json({
+      handleError(400, "password and confirm password must to be equal", {
+        equal: false,
         success: false,
-        msg: "password and confirm password must to be equal",
       });
     }
     if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "password must be more than 6 chracter" });
+      handleError(400, "password must be more than 6 chracter", {
+        success: false,
+        length: false,
+      });
+    }
+    const syncPassword = await bcrypt.compare(password, user.password);
+    if (syncPassword) {
+      handleError(400, "Enter A New Password", {
+        success: false,
+        newPassword: false,
+      });
     }
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
@@ -198,11 +189,6 @@ exports.setNewPassword = async (req, res) => {
     );
     return res.status(200).json({ success: true, message: "password updated" });
   } catch (error) {
-    return res.status(500).json({ msg: "there is a problem" });
+    next(error);
   }
-};
-const generateToken = (key) => {
-  return jwt.sign({ key }, process.env.JWT_SECRET, {
-    expiresIn: "30d",
-  });
 };

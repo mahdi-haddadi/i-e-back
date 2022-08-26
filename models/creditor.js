@@ -13,11 +13,15 @@ const creditorSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      default:null
+      default: null,
     },
     loanDate: {
       type: Date,
       default: null,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   {

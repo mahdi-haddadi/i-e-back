@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { schema } = require("./secure/userValidation");
+const { schema, schemaSignin } = require("./secure/userValidation");
 const userSchema = new mongoose.Schema(
   {
     fullname: {
@@ -17,10 +17,10 @@ const userSchema = new mongoose.Schema(
       required: [true, "please enter password"],
       minlength: [6, "password must be more than 6 chracter"],
     },
-    active:{
-      type:Boolean,
-      default:false
-    }
+    active: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema(
 
 userSchema.statics.userValidation = function (body) {
   return schema.validate(body, { abortEarly: false });
+};
+
+userSchema.statics.userSigninValidation = function (body) {
+  return schemaSignin.validate(body, { abortEarly: false });
 };
 
 const User = mongoose.model("User", userSchema);

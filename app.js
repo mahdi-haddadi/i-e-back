@@ -42,12 +42,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // route user
-app.use("/API/v1/user", require("./routes/user"));
+app.use("/API/v1/auth", require("./routes/user"));
 app.use("/API/v1/manage", require("./routes/manage"));
 
-// app.get("/API/v1/admin/profile", authenticated, (req, res) => {
-//   return res.status(200).json({ msg: "ok" });
-// });
 
 // page 404
 app.use("/", (req, res) => {

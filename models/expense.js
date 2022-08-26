@@ -9,7 +9,7 @@ const expenseSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      default:null
+      default: null,
     },
     source: {
       // type: mongoose.Schema.Types.name,
@@ -24,6 +24,10 @@ const expenseSchema = new mongoose.Schema(
     expenditureDate: {
       type: Date,
       required: [true, "Add This Field Expenditure Date"],
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   {

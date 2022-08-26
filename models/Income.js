@@ -17,7 +17,7 @@ const incomeSchema = new mongoose.Schema(
     storage: {
       // type: mongoose.Schema.Types.name,
       // ref: "Source",
-      type:String,
+      type: String,
       required: [true, "Add This Field Storage"],
     },
     title: {
@@ -27,7 +27,11 @@ const incomeSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      default:null
+      default: null,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   {

@@ -14,3 +14,8 @@ exports.schema = yup.object().shape({
     .required("تکرار رمز عبور را وارد کنید")
     .oneOf([yup.ref("password"), null], "رمز عبور با تکرار آن برابر نیست"),
 });
+
+exports.schemaSignin = yup.object().shape({
+  username: yup.string().required("نام کاربری را وارد کنید"),
+  password: yup.string().required("رمز عبور را وارد کنید"),
+});
