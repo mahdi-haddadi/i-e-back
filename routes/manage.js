@@ -39,27 +39,27 @@ router.put("/update-income", accessToken, handleUpdateIncome);
 router.delete("/delete-income", accessToken, handleDeleteIncome);
 
 // expense route
-router.get("/get-expense", handleGetExpense);
-router.post("/set-expense", handleSetExpense);
-router.put("/update-expense", handleUpdateExpense);
-router.delete("/delete-expense", handleDeleteExpense);
+router.get("/get-expense", accessToken, handleGetExpense);
+router.post("/set-expense", accessToken, handleSetExpense);
+router.put("/update-expense", accessToken, handleUpdateExpense);
+router.delete("/delete-expense", accessToken, handleDeleteExpense);
 
 // expense route
-router.get("/get-source", handleGetSource);
-router.post("/set-source", handleSetSource);
-router.put("/update-source", handleUpdateSource);
-router.delete("/delete-source", handleDeleteSource);
+router.get("/get-source", accessToken, handleGetSource);
+router.post("/set-source", accessToken, handleSetSource);
+router.put("/update-source", accessToken, handleUpdateSource);
+router.delete("/delete-source", accessToken, handleDeleteSource);
 
 // debtor route
-router.get("/get-debtor", handleGetDebtor);
-router.post("/set-debtor", handleSetDebtor);
-router.put("/update-debtor", handleUpdateDebtor);
-router.delete("/delete-debtor", handleDeleteDebtor);
+router.get("/get-debtor", accessToken, handleGetDebtor);
+router.post("/set-debtor", accessToken, handleSetDebtor);
+router.put("/update-debtor", accessToken, handleUpdateDebtor);
+router.delete("/delete-debtor", accessToken, handleDeleteDebtor);
 
 // creditor route
-router.get("/get-creditor", handleGetCreditor);
-router.post("/set-creditor", handleSetCreditor);
-router.put("/update-creditor", handleUpdateCreditor);
-router.delete("/delete-creditor", handleDeleteCreditor);
+router.get("/get-creditor", accessToken, handleGetCreditor);
+router.post("/set-creditor", accessToken, handleSetCreditor);
+router.put("/update-creditor", accessToken, handleUpdateCreditor);
+router.delete("/delete-creditor", accessToken, handleDeleteCreditor);
 
 module.exports = router;

@@ -2,11 +2,25 @@ const Expense = require("./../models/Expense");
 
 // @desc    get expense data
 // @route   GET  /API/v1/manage/get-expense
-// @access  public
+// @access  protect with token
 exports.handleGetExpense = async (req, res) => {
   try {
-    const expenseData = await Expense.find({});
-    return res.status(200).json(expenseData);
+    const expenseData = await Expense.find({ userId: req.userId });
+    const requiredData =
+      expenseData.length > 0 &&
+      expenseData.map((expense) => {
+        return {
+          id: expense._id,
+          title: expense.title,
+          description: expense.description,
+          source: expense.source,
+          cost: expense.cost,
+          source: expense.source,
+          expenditureDate: expense.expenditureDate,
+          createdAt: expense.createdAt,
+        };
+      });
+    return res.status(200).json({ data: requiredData });
   } catch (error) {
     return res
       .status(500)
@@ -16,27 +30,27 @@ exports.handleGetExpense = async (req, res) => {
 
 // @desc    set expense data
 // @route   POST  /API/v1/manage/set-expense
-// @access  public
+// @access  protect with token
 exports.handleSetExpense = async (req, res) => {
   try {
-    const { title, description, source, cost, expenditureDate } = req.body;
     await Expense.expenseValidation(req.body);
 
-    const expense = await Expense.create({
-      title,
-      description,
-      source,
-      cost,
-      expenditureDate,
-    });
-
-    if (expense) {
-      return res.status(201).json({
-        success: true,
-      });
-    } else {
-      return res.status(400).json({ msg: "invalid set expense" });
-    }
+    Expense.create(
+      {
+        ...req.body,
+        userId: req.userId,
+      },
+      (err, _) => {
+        if (err) {
+          return res
+            .status(400)
+            .json({ msg: "error in request", success: false, error: err });
+        }
+        return res.status(201).json({
+          success: true,
+        });
+      }
+    );
   } catch (error) {
     return res
       .status(500)
@@ -46,7 +60,7 @@ exports.handleSetExpense = async (req, res) => {
 
 // @desc    update expense data
 // @route   PUT  /API/v1/manage/update-expense
-// @access  public
+// @access  protect with token
 exports.handleUpdateExpense = async (req, res) => {
   try {
     const { title, description, source, cost, expenditureDate, _id } = req.body;
@@ -59,17 +73,21 @@ exports.handleUpdateExpense = async (req, res) => {
       expenditureDate,
     });
 
-    const update = await Expense.updateOne(
-      { _id },
-      { title, description, source, cost, expenditureDate }
+    Expense.updateOne(
+      { _id, userId: req.userId },
+      { $set: { title, description, source, cost, expenditureDate } },
+      null,
+      (err, docs) => {
+        if (err) {
+          return res.status(400, {
+            msg: "error in request",
+            success: false,
+            error: err,
+          });
+        }
+        return res.status(200).json({ success: true });
+      }
     );
-    // or $inc
-
-    if (update) {
-      return res.status(200).json({ success: true });
-    } else {
-      return res.status(400).json({ msg: "invalid set expense" });
-    }
   } catch (error) {
     return res
       .status(500)
@@ -79,11 +97,21 @@ exports.handleUpdateExpense = async (req, res) => {
 
 // @desc    delete expense data
 // @route   DELETE  /API/v1/manage/delete-expense
-// @access  public
+// @access  protect with token
 exports.handleDeleteExpense = async (req, res) => {
   try {
-    await Expense.deleteOne({ _id: req.body._id });
-    return res.status(200).json({ success: true });
+    Expense.findOneAndDelete(
+      { _id: req.body._id, userId: req.userId },
+      null,
+      (err) => {
+        if (err) {
+          return res
+            .status(400)
+            .json({ msg: "error in request", success: false, error: err });
+        }
+        return res.status(200).json({ success: true });
+      }
+    );
   } catch (error) {
     return res
       .status(400)
