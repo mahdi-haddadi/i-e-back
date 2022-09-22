@@ -2,11 +2,22 @@ const Debtor = require("./../models/Debtor");
 
 // @desc    get debtor data
 // @route   GET  /API/v1/manage/get-debtor
-// @access  public
+// @access  protect with token
 exports.handleGetDebtor = async (req, res) => {
   try {
-    const debtorData = await Debtor.find({});
-    return res.status(200).json(debtorData);
+    const debtorData = await Debtor.find({ userId: req.userId });
+    const requiredData = debtorData.map((debtor) => {
+      return {
+        id: debtor._id,
+        who: debtor.who,
+        amount: debtor.amount,
+        sourcePayment: debtor.sourcePayment,
+        description: debtor.description,
+        createdAt: debtor.createdAt,
+        datePaid: debtor.datePaid,
+      };
+    });
+    return res.status(200).json({ data: requiredData });
   } catch (error) {
     return res
       .status(500)
@@ -16,29 +27,34 @@ exports.handleGetDebtor = async (req, res) => {
 
 // @desc    set debtor data
 // @route   POST  /API/v1/manage/set-debtor
-// @access  public
+// @access  protect with token
 exports.handleSetDebtor = async (req, res) => {
   try {
     const { who, amount, paid, sourcePayment, datePaid, description } =
       req.body;
     await Debtor.debtorValidation({ who, amount });
 
-    const expense = await Debtor.create({
-      who,
-      amount,
-      paid,
-      sourcePayment,
-      datePaid,
-      description,
-    });
-
-    if (expense) {
-      return res.status(201).json({
-        success: true,
-      });
-    } else {
-      return res.status(400).json({ msg: "invalid set debtor" });
-    }
+    Debtor.create(
+      {
+        who,
+        amount,
+        paid,
+        sourcePayment,
+        datePaid,
+        description,
+        userId: req.userId,
+      },
+      (err, _) => {
+        if (err) {
+          return res
+            .status(400)
+            .json({ msg: "error in request", success: false, error: err });
+        }
+        return res.status(201).json({
+          success: true,
+        });
+      }
+    );
   } catch (error) {
     return res
       .status(500)
@@ -48,7 +64,7 @@ exports.handleSetDebtor = async (req, res) => {
 
 // @desc    update debtor data
 // @route   PUT  /API/v1/manage/update-debtor
-// @access  public
+// @access  protect with token
 exports.handleUpdateDebtor = async (req, res) => {
   try {
     const { who, amount, paid, sourcePayment, datePaid, description, _id } =
@@ -56,17 +72,21 @@ exports.handleUpdateDebtor = async (req, res) => {
 
     await Debtor.debtorValidation({ who, amount });
 
-    const update = await Debtor.updateOne(
-      { _id },
-      { who, amount, paid, sourcePayment, datePaid, description }
+    Debtor.updateOne(
+      { _id: _id, userId: req.userId },
+      { $set: { who, amount, paid, sourcePayment, datePaid, description } },
+      null,
+      (err, docs) => {
+        if (err) {
+          return res.status(400, {
+            msg: "error in request",
+            success: false,
+            error: err,
+          });
+        }
+        return res.status(200).json({ success: true });
+      }
     );
-    // or $inc
-
-    if (update) {
-      return res.status(200).json({ success: true });
-    } else {
-      return res.status(400).json({ msg: "invalid set debtor" });
-    }
   } catch (error) {
     return res
       .status(500)
@@ -76,11 +96,21 @@ exports.handleUpdateDebtor = async (req, res) => {
 
 // @desc    delete debtor data
 // @route   DELETE  /API/v1/manage/delete-debtor
-// @access  public
+// @access  protect with token
 exports.handleDeleteDebtor = async (req, res) => {
   try {
-    await Debtor.deleteOne({ _id: req.body._id });
-    return res.status(200).json({ success: true });
+    Debtor.findOneAndDelete(
+      { _id: req.body._id, userId: req.userId },
+      null,
+      (err) => {
+        if (err) {
+          return res
+            .status(400)
+            .json({ msg: "error in request", success: false, error: err });
+        }
+        return res.status(200).json({ success: true });
+      }
+    );
   } catch (error) {
     return res
       .status(400)
